@@ -1,11 +1,13 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAdminConfirmForgotPasswordMutation } from "@/redux/auth/authApi";
 import ErrorMsg from "@/app/components/common/error-msg";
 import { notifyError, notifySuccess } from "@/utils/toast";
+import {useRouter} from 'next/navigation';
+import LoadingSpinner from "@/app/components/LoadingSpinner/LoadingSpinner";
 
 // schema
 const schema = Yup.object().shape({
@@ -18,6 +20,8 @@ const schema = Yup.object().shape({
 
 const ForgetPasswordPage = ({ params }: { params: { id: string } }) => {
   const token = params.id;
+  const router = useRouter();
+  const [loading , setloading]=useState(false);
   const [adminConfirmForgotPassword, {}] =
     useAdminConfirmForgotPasswordMutation();
   // react hook form
@@ -31,11 +35,13 @@ const ForgetPasswordPage = ({ params }: { params: { id: string } }) => {
   });
   // onSubmit
   const onSubmit = async (data: { password: string }) => {
+    setloading(true)
     const res = await adminConfirmForgotPassword({
       password: data.password,
       token,
     });
     if ("error" in res) {
+      setloading(false)
       if ("data" in res.error) {
         const errorData = res.error.data as { message?: string };
         if (typeof errorData.message === "string") {
@@ -43,15 +49,19 @@ const ForgetPasswordPage = ({ params }: { params: { id: string } }) => {
         }
       }
     } else {
+      setloading(false)
       if ("data" in res) {
         if("message" in res.data){
           notifySuccess(res.data.message);
+          router.push('/login')
         }
       }
       reset();
     }
   };
   return (
+    <>
+    {loading==true && <LoadingSpinner/>}
     <div className="tp-main-wrapper h-screen">
       <div className="container mx-auto my-auto h-full flex items-center justify-center">
         <div className="pt-[120px] pb-[120px]">
@@ -98,6 +108,7 @@ const ForgetPasswordPage = ({ params }: { params: { id: string } }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
