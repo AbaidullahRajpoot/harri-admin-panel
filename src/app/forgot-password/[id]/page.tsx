@@ -16,8 +16,8 @@ const schema = Yup.object().shape({
   ),
 });
 
-const ForgetPasswordPage = ({ params }: { params: { token: string } }) => {
-  const token = params.token;
+const ForgetPasswordPage = ({ params }: { params: { id: string } }) => {
+  const token = params.id;
   const [adminConfirmForgotPassword, {}] =
     useAdminConfirmForgotPasswordMutation();
   // react hook form

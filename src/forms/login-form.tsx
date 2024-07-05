@@ -8,6 +8,7 @@ import { notifyError, notifySuccess } from "@/utils/toast";
 import { useLoginAdminMutation } from "@/redux/auth/authApi";
 import ErrorMsg from "@/app/components/common/error-msg";
 import Link from "next/link";
+import LoadingSpinner from '../app/components/LoadingSpinner/LoadingSpinner';
 
 // schema
 const schema = Yup.object().shape({
@@ -16,6 +17,7 @@ const schema = Yup.object().shape({
 });
 
 const LoginForm = () => {
+  const [loading,setloading]=useState(false);
   const [loginAdmin, {data:loginData}] = useLoginAdminMutation();
   const router = useRouter();
   // react hook form
@@ -24,21 +26,28 @@ const LoginForm = () => {
   });
   // onSubmit
   const onSubmit =async (data: { email: string; password: string }) => {
+    setloading(true)
     const res = await loginAdmin({ email: data.email, password: data.password });
     if ("error" in res) {
       if ("data" in res.error) {
+        setloading(false)
         const errorData = res.error.data as { message?: string };
         if (typeof errorData.message === "string") {
           return notifyError(errorData.message);
         }
       }
     } else {
+      setloading(false)
       notifySuccess("Login successfully");
       router.push('/dashboard')
       reset();
     }
   };
   return (
+    <>
+    {
+      loading==true && <LoadingSpinner/>
+    }
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-5">
         <p className="mb-0 text-base text-black">
@@ -87,6 +96,7 @@ const LoginForm = () => {
         Sign In
       </button>
     </form>
+    </>
   );
 };
 

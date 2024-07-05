@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import ProfileChangePass from "./profile-change-pass";
 import { notifyError, notifySuccess } from "@/utils/toast";
 import AdminRole from "./admin-role";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 
 // prop type
 type IPropType = {
@@ -17,6 +18,7 @@ type IPropType = {
 const ProfileContent = ({ profileImg,updateProfile}: IPropType) => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [adminRole, setAdminRole] = useState<string>("");
+  const [loading, setloading] = useState<boolean>(false);
   // react hook form
   const {
     register,
@@ -32,6 +34,7 @@ const ProfileContent = ({ profileImg,updateProfile}: IPropType) => {
     phone?: string;
   }) => {
     if (user?._id && formData) {
+      setloading(true)
       const res = await updateProfile({
         id: user._id,
         data: {
@@ -45,12 +48,14 @@ const ProfileContent = ({ profileImg,updateProfile}: IPropType) => {
       });
       if ("error" in res) {
         if ("data" in res.error) {
+          setloading(false)
           const errorData = res.error.data as { message?: string };
           if (typeof errorData.message === "string") {
             return notifyError(errorData.message);
           }
         }
       } else {
+        setloading(false)
         notifySuccess("Profile update successfully");
         reset();
       }
@@ -61,6 +66,9 @@ const ProfileContent = ({ profileImg,updateProfile}: IPropType) => {
   };
   return (
     <>
+    {
+      loading == true && <LoadingSpinner/>
+    }
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-12 2xl:col-span-8">
           <div className="py-10 px-10 bg-white rounded-md">

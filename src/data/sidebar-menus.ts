@@ -73,17 +73,17 @@ const sidebar_menu: Array<ISidebarMenus> = [
     link: "/our-staff",
     title: "Our Staff",
   },
-  {
-    id: 10,
-    icon: Pages,
-    link: "/dashboard",
-    title: "Pages",
-    subMenus: [
-      { title: "Register", link: "/register" },
-      { title: "Login", link: "/login" },
-      { title: "Forgot Password", link: "/forgot-password" }
-    ],
-  },
+  // {
+  //   id: 10,
+  //   icon: Pages,
+  //   link: "/dashboard",
+  //   title: "Pages",
+  //   subMenus: [
+  //     { title: "Register", link: "/register" },
+  //     { title: "Login", link: "/login" },
+  //     { title: "Forgot Password", link: "/forgot-password" }
+  //   ],
+  // },
   
 ];
 

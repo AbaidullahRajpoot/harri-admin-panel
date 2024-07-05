@@ -1,6 +1,6 @@
 "use client";
 import { useAdminChangePasswordMutation} from "@/redux/auth/authApi";
-import React from "react";
+import React, { useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import ErrorMsg from "../common/error-msg";
 import { notifyError, notifySuccess } from "@/utils/toast";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 
 // schema
 const schema = Yup.object().shape({
@@ -22,6 +23,7 @@ const schema = Yup.object().shape({
 const ProfileChangePass = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [changePassword, {}] = useAdminChangePasswordMutation();
+  const [loading, setloading] = useState<boolean>(false);
   // react hook form
   const {
     register,
@@ -35,12 +37,14 @@ const ProfileChangePass = () => {
   // on submit
   const onSubmit = async (data: { password: string; newPassword: string }) => {
     if (user) {
+      setloading(true)
      const res =  await changePassword({
         email: user.email,
         oldPass: data.password,
         newPass: data.newPassword,
       });
       if ("error" in res) {
+        setloading(false)
         if ("data" in res.error) {
           const errorData = res.error.data as { message?: string };
           if (typeof errorData.message === "string") {
@@ -48,6 +52,7 @@ const ProfileChangePass = () => {
           }
         }
       } else {
+        setloading(false)
         notifySuccess("Password change successfully");
         reset();
       }
@@ -55,6 +60,10 @@ const ProfileChangePass = () => {
     reset();
   };
   return (
+    <>
+    {
+      loading==true && <LoadingSpinner/>
+    }
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-5">
         <p className="mb-0 text-base text-black">Current Password</p>
@@ -97,6 +106,7 @@ const ProfileChangePass = () => {
         <button className="tp-btn px-10 py-2">Save</button>
       </div>
     </form>
+    </>
   );
 };
 

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -7,6 +7,7 @@ import ErrorMsg from "../common/error-msg";
 import { useForgetPasswordMutation } from "@/redux/auth/authApi";
 import { notifyError, notifySuccess } from "@/utils/toast";
 import Link from "next/link";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 
 // schema
 const schema = Yup.object().shape({
@@ -14,6 +15,7 @@ const schema = Yup.object().shape({
 });
 
 const ForgotForm = () => {
+  const [loading,setloading]=useState(false);
   const [forgetPassword, {}] = useForgetPasswordMutation();
   // react hook form
   const {
@@ -26,10 +28,12 @@ const ForgotForm = () => {
   });
   // onSubmit
   const onSubmit = async (data: { email: string }) => {
+    setloading(true)
     const res = await forgetPassword({
       email: data.email,
     });
     if ("error" in res) {
+      setloading(false)
       if ("data" in res.error) {
         const errorData = res.error.data as { message?: string };
         if (typeof errorData.message === "string") {
@@ -37,6 +41,7 @@ const ForgotForm = () => {
         }
       }
     } else {
+      setloading(false)
       if ("data" in res) {
         if("message" in res.data){
           notifySuccess(res.data.message);
@@ -46,6 +51,8 @@ const ForgotForm = () => {
     }
   };
   return (
+    <>
+     {loading == true && <LoadingSpinner/>}
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-5">
         <p className="mb-0 text-base text-black">
@@ -76,6 +83,7 @@ const ForgotForm = () => {
         </p>
       </div>
     </form>
+    </>
   );
 };
 
