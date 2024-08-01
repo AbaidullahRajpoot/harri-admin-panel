@@ -7,13 +7,13 @@ import { Search } from "@/svg";
 import ErrorMsg from "../common/error-msg";
 import Pagination from "../ui/Pagination";
 import OrderStatusChange from "./status-change";
-import {useGetAllOrdersQuery} from "@/redux/order/orderApi";
+import { useGetAllOrdersQuery } from "@/redux/order/orderApi";
 
 
 const OrderTable = () => {
   const { data: orders, isError, isLoading, error } = useGetAllOrdersQuery();
-  const [searchVal,setSearchVal] = useState<string>("");
-  const [selectVal,setSelectVal] = useState<string>("");
+  const [searchVal, setSearchVal] = useState<string>("");
+  const [selectVal, setSelectVal] = useState<string>("");
   const [currPage, setCurrPage] = useState(1);
   const [countOfPage, setCountOfPage] = useState(5);
 
@@ -34,10 +34,10 @@ const OrderTable = () => {
     let orderItems = orders.data;
     const totalPage = Math.ceil(orderItems.length / countOfPage);
     const pageStart = (currPage - 1) * countOfPage;
-    if(searchVal){
+    if (searchVal) {
       orderItems = orderItems.filter(v => v.invoice.toString().includes(searchVal))
     }
-    if(selectVal){
+    if (selectVal) {
       orderItems = orderItems.filter(v => v.status.toLowerCase() === selectVal.toLowerCase())
     }
 
@@ -133,23 +133,30 @@ const OrderTable = () => {
                   </td>
                   <td className="px-3 py-3 font-normal text-[#55585B] text-end">
                     $
-                    {item.cart
+                    {/* {item.cart
                       .reduce((acc, curr) => acc + curr.price, 0)
-                      .toFixed(2)}
+                      .toFixed(2)} */}
+                    {
+                      item.cart.reduce((acc, curr) => {
+                        // Calculate discount based on original price and apply quantity
+                        const discountedPrice = ((curr.originalPrice-((curr.discount / 100)*curr.originalPrice))+item.shippingCost)*curr.orderQuantity
+                        return discountedPrice;
+                      }, 0)
+                    }
+
                   </td>
                   <td className="px-3 py-3 text-end">
                     <span
-                      className={`text-[11px] ${
-                        item.status === "pending"
+                      className={`text-[11px] ${item.status === "pending"
                           ? "text-warning bg-warning/10"
                           : item.status === "delivered"
-                          ? "text-success bg-success/10"
-                          : item.status === "processing"
-                          ? "text-indigo-500 bg-indigo-100"
-                          : item.status === "cancel"
-                          ? "text-danger bg-danger/10"
-                          : ""
-                      } px-3 py-1 rounded-md leading-none font-medium text-end`}
+                            ? "text-success bg-success/10"
+                            : item.status === "processing"
+                              ? "text-indigo-500 bg-indigo-100"
+                              : item.status === "cancel"
+                                ? "text-danger bg-danger/10"
+                                : ""
+                        } px-3 py-1 rounded-md leading-none font-medium text-end`}
                     >
                       {item.status}
                     </span>
@@ -160,7 +167,7 @@ const OrderTable = () => {
 
                   <td className="px-9 py-3 text-end">
                     <div className="flex items-center justify-end space-x-2">
-                      <OrderStatusChange id={item._id}/>
+                      <OrderStatusChange id={item._id} />
                     </div>
                   </td>
                   {/* order actions */}

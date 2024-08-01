@@ -10,7 +10,7 @@ import { notifyError } from "@/utils/toast";
 const OrderDetailsArea = ({ id }: { id: string }) => {
   const { data: orderData, isLoading, isError } = useGetSingleOrderQuery(id);
   const printRef = useRef<HTMLDivElement | null>(null);
-
+  console.log(orderData)
   // decide what to render
   let content = null;
 
@@ -29,10 +29,14 @@ const OrderDetailsArea = ({ id }: { id: string }) => {
       "Item Price",
       "Amount",
     ];
-    const total = orderData.cart.reduce((acc, curr) => acc + curr.price, 0);
+   
+    const total =  orderData.cart.reduce((acc, curr) => {
+      // Calculate discount based on original price and apply quantity
+      const discountedPrice = ((curr.originalPrice-((curr.discount / 100)*curr.originalPrice)))*curr.orderQuantity
+      return discountedPrice;
+    }, 0)
     const grand_total = (total +
-      orderData.shippingCost +
-      (orderData.discount ?? 0)) as number;
+      orderData.shippingCost) as number;
     content = (
       <>
         <div className="container grid px-6 mx-auto">
@@ -65,7 +69,7 @@ const OrderDetailsArea = ({ id }: { id: string }) => {
                     /> */}
                   </h2>
                   <p className="text-base text-gray-500 dark:text-gray-400 mt-2">
-                    Dhaka, Bangladesh
+                    Punjab, Pakistan
                   </p>
                 </div>
               </div>
@@ -127,10 +131,10 @@ const OrderDetailsArea = ({ id }: { id: string }) => {
                             {item.orderQuantity}
                           </td>
                           <td className="bg-white border-b border-gray6 px-3 py-3 font-bold text-center">
-                            ${item.price.toFixed(2)}
+                            ${orderData?.subTotal.toFixed(2)}
                           </td>
                           <td className="bg-white border-b border-gray6 px-3 py-3 text-right font-bold">
-                            ${(item.price * item.orderQuantity).toFixed(2)}
+                            ${orderData?.totalAmount.toFixed(2)}
                           </td>
                         </tr>
                       ))}
@@ -146,7 +150,7 @@ const OrderDetailsArea = ({ id }: { id: string }) => {
                     PAYMENT METHOD
                   </span>
                   <span className="text-base font-semibold block">
-                    {orderData.paymentMethod}
+                    {orderData?.cardInfo?.type}
                   </span>
                 </div>
                 <div className="mb-3 md:mb-0 lg:mb-0  flex flex-col sm:flex-wrap">
@@ -162,7 +166,7 @@ const OrderDetailsArea = ({ id }: { id: string }) => {
                     DISCOUNT
                   </span>
                   <span className="text-base text-gray-500 font-semibold font-heading block">
-                    ${orderData?.discount}
+                    ${orderData?.cart[0]?.discount}%
                   </span>
                 </div>
                 <div className="flex flex-col sm:flex-wrap">
