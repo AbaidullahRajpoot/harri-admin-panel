@@ -15,6 +15,7 @@ interface IUser {
 }
 
 export interface Order {
+  cardInfo: any;
   _id: string;
   user:IUser;
   cart: IProduct[];

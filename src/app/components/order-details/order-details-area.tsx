@@ -30,11 +30,12 @@ const OrderDetailsArea = ({ id }: { id: string }) => {
       "Amount",
     ];
    
-    const total =  orderData.cart.reduce((acc, curr) => {
+   const total = orderData.cart.reduce((acc, curr) => {
       // Calculate discount based on original price and apply quantity
-      const discountedPrice = ((curr.originalPrice-((curr.discount / 100)*curr.originalPrice)))*curr.orderQuantity
-      return discountedPrice;
-    }, 0)
+      const discount = curr.discount ?? 0;
+      const discountedPrice = (curr.originalPrice - (discount / 100) * curr.originalPrice) * curr.orderQuantity;
+      return acc + discountedPrice;
+    }, 0);
     const grand_total = (total +
       orderData.shippingCost) as number;
     content = (
