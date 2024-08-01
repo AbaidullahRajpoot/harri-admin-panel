@@ -136,13 +136,14 @@ const OrderTable = () => {
                     {/* {item.cart
                       .reduce((acc, curr) => acc + curr.price, 0)
                       .toFixed(2)} */}
-                    {
-                      item.cart.reduce((acc, curr) => {
-                        // Calculate discount based on original price and apply quantity
-                        const discountedPrice = ((curr.originalPrice-((curr.discount / 100)*curr.originalPrice))+item.shippingCost)*curr.orderQuantity
-                        return discountedPrice;
-                      }, 0)
-                    }
+                      {
+                        item.cart.reduce((acc, curr) => {
+                          // Calculate discount based on original price and apply quantity
+                          const discount = curr.discount ?? 0;
+                          const discountedPrice = ((curr.originalPrice-((discount/ 100)*curr.originalPrice))+item.shippingCost)*curr.orderQuantity
+                          return discountedPrice;
+                        }, 0)
+                      }
 
                   </td>
                   <td className="px-3 py-3 text-end">
